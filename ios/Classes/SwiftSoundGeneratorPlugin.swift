@@ -6,10 +6,12 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   var onChangeIsPlaying: BetterEventChannel?;
   var onOneCycleDataHandler: BetterEventChannel?;
   // This is not used yet.
-  var sampleRate: Int = 48000;
-  var isPlaying: Bool = false;
-  var oscillator: AKOscillator = AKOscillator(waveform: AKTable(.sawtooth));
-  var mixer: AKMixer?;
+    var sampleRate: Int = 48000;
+    var isPlaying: Bool = false;
+    var oscillator: AKOscillator = AKOscillator(waveform: AKTable(.sine));
+    var oscillator2: AKOscillator = AKOscillator(waveform: AKTable(.triangle));
+    var oscillator3: AKOscillator = AKOscillator(waveform: AKTable(.square));
+    var mixer: AKMixer?;
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     /*let instance =*/ _ = SwiftSoundGeneratorPlugin(registrar: registrar)
