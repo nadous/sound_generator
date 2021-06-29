@@ -85,6 +85,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             self.oscillator.waveform= .square
             break;
           default:
+            self.oscillator.waveform= .square
             break;
      
             result(nil);
