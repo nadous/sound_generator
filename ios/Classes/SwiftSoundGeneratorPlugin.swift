@@ -25,7 +25,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   public init(registrar: FlutterPluginRegistrar) {
     super.init()
     self.mixer = Mixer()
-    self.addInput(oscillator)
+    self.mixer.addInput(oscillator)
     self.mixer.volume = 1.0
     Settings.disableAVAudioSessionCategoryManagement = true
     //Settings.disableAudioSessionDeactivationOnStop = true
