@@ -8,13 +8,13 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   // This is not used yet.
     var sampleRate: Int = 48000;
     var isPlaying: Bool = false;
-    var oscillator: AKOscillator = AKOscillator(waveform: AKTable(.sine));
-    var oscillator2: AKOscillator = AKOscillator(waveform: AKTable(.triangle));
-    var oscillator3: AKOscillator = AKOscillator(waveform: AKTable(.square));
-    /*var oscillator = AKOperationGenerator { parameters in
+    var oscillator: Oscillator = Oscillator(waveform: Table(.sine));
+    var oscillator2: Oscillator = Oscillator(waveform: Table(.triangle));
+    var oscillator3: Oscillator = Oscillator(waveform: Table(.square));
+    /*var oscillator = OperationGenerator { parameters in
            returnAKOperation.sawtoothWave(frequency: GeneratorSource.frequency)
     )*/
-    var mixer: AKMixer?;
+    var mixer: Mixer?;
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     /*let instance =*/ _ = SwiftSoundGeneratorPlugin(registrar: registrar)
@@ -22,11 +22,11 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
 
   public init(registrar: FlutterPluginRegistrar) {
     super.init()
-    self.mixer = AKMixer(self.oscillator)
+    self.mixer = Mixer(self.oscillator)
     self.mixer!.volume = 1.0
-    AKSettings.disableAVAudioSessionCategoryManagement = true
-    AKSettings.disableAudioSessionDeactivationOnStop = true
-    AKManager.output = self.mixer!
+    Settings.disableAVAudioSessionCategoryManagement = true
+    Settings.disableAudioSessionDeactivationOnStop = true
+    Manager.output = self.mixer!
     let methodChannel = FlutterMethodChannel(name: "sound_generator", binaryMessenger: registrar.messenger())
     self.onChangeIsPlaying = BetterEventChannel(name: "io.github.mertguner.sound_generator/onChangeIsPlaying", messenger: registrar.messenger())
     self.onOneCycleDataHandler = BetterEventChannel(name: "io.github.mertguner.sound_generator/onOneCycleDataHandler", messenger: registrar.messenger())
@@ -40,12 +40,12 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         //let sampleRate = args["sampleRate"] as Int
         self.oscillator.frequency = 400
         do {
-            try AKManager.start()
+            try Manager.start()
             result(true);
         } catch {
             result(FlutterError(
                 code: "init_error",
-                message: "Unable to start AKManager",
+                message: "Unable to start Manager",
                 details: ""))
         }
         break
@@ -79,29 +79,29 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         print(waveType)
         switch waveType{
           case "0":
-            //self.oscillator = AKOscillator(waveform: AKTable(.sine));
+            //self.oscillator = Oscillator(waveform: Table(.sine));
             self.mixer.removeAllInputs()
             self.mixer(self.oscillator2)
-            //AKManager.output = self.mixer!
+            //Manager.output = self.mixer!
             break;
           case "1":
-            //self.oscillator = AKOscillator(waveform: AKTable(.sawtooth));
+            //self.oscillator = Oscillator(waveform: Table(.sawtooth));
             self.mixer.removeAllInputs()
             self.mixer(self.oscillator2)
-            //AKManager.output = self.mixer!
+            //Manager.output = self.mixer!
             break;
           case "2":
-            //self.oscillator = AKOscillator(waveform: AKTable(.triangle));
+            //self.oscillator = Oscillator(waveform: Table(.triangle));
             self.mixer.removeAllInputs()
             self.mixer(self.oscillator2)
-            //AKManager.output = self.mixer!
+            //Manager.output = self.mixer!
             break;
           
           default:
-            //self.oscillator = AKOscillator(waveform: AKTable(.square));
+            //self.oscillator = Oscillator(waveform: Table(.square));
             self.mixer.removeAllInputs()
             self.mixer(self.oscillator2)
-            //AKManager.output = self.mixer!
+            //Manager.output = self.mixer!
             break;
             
         }
