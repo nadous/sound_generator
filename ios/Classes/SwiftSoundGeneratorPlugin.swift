@@ -25,10 +25,10 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   public init(registrar: FlutterPluginRegistrar) {
     super.init()
     self.mixer = Mixer(self.oscillator)
-    self.mixer!.volume = 1.0
+    self.mixer.volume = 1.0
     Settings.disableAVAudioSessionCategoryManagement = true
     Settings.disableAudioSessionDeactivationOnStop = true
-    engine.output = self.mixer!
+    engine.output = self.mixer
     let methodChannel = FlutterMethodChannel(name: "sound_generator", binaryMessenger: registrar.messenger())
     self.onChangeIsPlaying = BetterEventChannel(name: "io.github.mertguner.sound_generator/onChangeIsPlaying", messenger: registrar.messenger())
     self.onOneCycleDataHandler = BetterEventChannel(name: "io.github.mertguner.sound_generator/onOneCycleDataHandler", messenger: registrar.messenger())
@@ -89,20 +89,20 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
           case "1":
             //self.oscillator = Oscillator(waveform: Table(.sawtooth));
             self.mixer.removeAllInputs()
-            self.mixer(self.oscillator2)
+            self.mixer.addInput(self.oscillator2)
             //engine.output = self.mixer!
             break;
           case "2":
             //self.oscillator = Oscillator(waveform: Table(.triangle));
             self.mixer.removeAllInputs()
-            self.mixer(self.oscillator2)
+            self.mixer.addInput(self.oscillator2)
             //engine.output = self.mixer!
             break;
           
           default:
             //self.oscillator = Oscillator(waveform: Table(.square));
             self.mixer.removeAllInputs()
-            self.mixer(self.oscillator2)
+            self.mixer.addInput(self.oscillator2)
             //engine.output = self.mixer!
             break;
             
@@ -114,7 +114,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         break;
       case "setVolume":
         let args = call.arguments as! [String: Any]
-        self.mixer!.volume = args["volume"] as! Float
+        self.mixer.volume = args["volume"] as! Float
         result(nil);
         break;
       case "getSampleRate":
