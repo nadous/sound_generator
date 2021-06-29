@@ -12,9 +12,9 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
 
     var sampleRate: Int = 48000;
     var isPlaying: Bool = false;
-    var oscillator: Oscillator = Oscillator(waveform: Table(.sine));
-    var oscillator2: Oscillator = Oscillator(waveform: Table(.triangle));
-    var oscillator3: Oscillator = Oscillator(waveform: Table(.square));
+    var oscillator: Oscillator = Oscillator();
+    var oscillator2: Oscillator = Oscillator();
+    var oscillator3: Oscillator = Oscillator();
     /*var oscillator = OperationGenerator { parameters in
            returnAKOperation.sawtoothWave(frequency: GeneratorSource.frequency)
     )*/
