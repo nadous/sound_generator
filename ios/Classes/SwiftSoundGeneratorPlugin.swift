@@ -13,8 +13,8 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     var sampleRate: Int = 48000;
     var isPlaying: Bool = false;
     var osc: Oscillator = Oscillator();
-    var osc2: Oscillator = Oscillator();
-    var osc3: Oscillator = Oscillator();
+    //var osc2: Oscillator = Oscillator();
+    //var osc3: Oscillator = Oscillator();
     /*var oscillator = OperationGenerator { parameters in
            returnAKOperation.sawtoothWave(frequency: GeneratorSource.frequency)
     )*/
@@ -46,6 +46,8 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         //let args = call.arguments as! [String: Any]
         //let sampleRate = args["sampleRate"] as Int
         self.osc.frequency = 400
+        
+        
         do {
             try engine.start()
             result(true);
@@ -88,26 +90,26 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
           case "0":
             //self.osc = osc(waveform: Table(.sine));
             self.mixer.removeAllInputs()
-            self.mixer.addInput(self.osc2)
+            self.mixer.addInput(self.osc)
             //engine.output = self.mixer!
             break;
           case "1":
             //self.osc = Oscillator(waveform: Table(.sawtooth));
             self.mixer.removeAllInputs()
-            self.mixer.addInput(self.osc2)
+            self.mixer.addInput(self.osc)
             //engine.output = self.mixer!
             break;
           case "2":
             //self.osc = Oscillator(waveform: Table(.triangle));
             self.mixer.removeAllInputs()
-            self.mixer.addInput(self.osc2)
+            self.mixer.addInput(self.osc)
             //engine.output = self.mixer!
             break;
           
           default:
             //self.osc = Oscillator(waveform: Table(.square));
             self.mixer.removeAllInputs()
-            self.mixer.addInput(self.osc2)
+            self.mixer.addInput(self.osc)
             //engine.output = self.mixer!
             break;
             
