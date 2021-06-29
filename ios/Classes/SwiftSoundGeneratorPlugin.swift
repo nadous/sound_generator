@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import AudioKit
+import Sound
 
 public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   var onChangeIsPlaying: BetterEventChannel?;
@@ -26,6 +27,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     super.init()
     //self.mixer = Mixer()
     //self.mixer.init()
+    self.oscillator.init()
     self.mixer.addInput(oscillator)
     self.mixer.volume = 1.0
     Settings.disableAVAudioSessionCategoryManagement = true
