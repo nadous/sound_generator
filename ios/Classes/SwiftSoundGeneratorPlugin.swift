@@ -8,9 +8,12 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   // This is not used yet.
     var sampleRate: Int = 48000;
     var isPlaying: Bool = false;
-    var oscillator: AKOscillator = AKOscillator(waveform: AKTable(.sine));
-    var oscillator2: AKOscillator = AKOscillator(waveform: AKTable(.triangle));
-    var oscillator3: AKOscillator = AKOscillator(waveform: AKTable(.square));
+    //var oscillator: AKOscillator = AKOscillator(waveform: AKTable(.sine));
+    //var oscillator2: AKOscillator = AKOscillator(waveform: AKTable(.triangle));
+    //var oscillator3: AKOscillator = AKOscillator(waveform: AKTable(.square));
+    var oscillator = AKOperationGenerator { parameters in
+           returnAKOperation.sawtoothWave(frequency: GeneratorSource.frequency)
+    )
     var mixer: AKMixer?;
 
   public static func register(with registrar: FlutterPluginRegistrar) {
