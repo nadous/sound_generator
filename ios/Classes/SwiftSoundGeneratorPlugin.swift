@@ -35,6 +35,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         //let args = call.arguments as! [String: Any]
         //let sampleRate = args["sampleRate"] as Int
         self.oscillator.frequency = 400
+        self.oscillator2.frequency = 800
         do {
             try AKManager.start()
             result(true);
@@ -50,6 +51,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         break;
       case "play":
         self.oscillator.start()
+        self.oscillator2.start()
         onChangeIsPlaying!.sendEvent(event: true)
         result(nil);
         break;
