@@ -9,6 +9,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   var sampleRate: Int = 48000;
   var isPlaying: Bool = false;
   var oscillator: AKOscillator = AKOscillator();
+  var oscillator2: AKOscillator = AKOscillator();
   var mixer: AKMixer?;
 
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -17,7 +18,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
 
   public init(registrar: FlutterPluginRegistrar) {
     super.init()
-    self.mixer = AKMixer(self.oscillator)
+    self.mixer = AKMixer(self.oscillator,self.oscillator2)
     self.mixer!.volume = 1.0
     AKSettings.disableAVAudioSessionCategoryManagement = true
     AKSettings.disableAudioSessionDeactivationOnStop = true
