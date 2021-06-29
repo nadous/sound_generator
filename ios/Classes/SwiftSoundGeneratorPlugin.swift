@@ -16,7 +16,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     /*var oscillator = OperationGenerator { parameters in
            returnAKOperation.sawtoothWave(frequency: GeneratorSource.frequency)
     )*/
-    var mixer: Mixer?;
+    var mixer: Mixer;
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     /*let instance =*/ _ = SwiftSoundGeneratorPlugin(registrar: registrar)
