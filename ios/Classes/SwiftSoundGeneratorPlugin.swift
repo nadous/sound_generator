@@ -1,24 +1,15 @@
 import Flutter
 import UIKit
 import AudioKit
-//import SoundpipeAudioKit
-
 
 public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   var onChangeIsPlaying: BetterEventChannel?;
   var onOneCycleDataHandler: BetterEventChannel?;
   // This is not used yet.
-    let engine = AudioEngine()
-
-    var sampleRate: Int = 48000;
-    var isPlaying: Bool = false;
-    var osc: Oscillator = Oscillator();
-    //var osc2: Oscillator = Oscillator();
-    //var osc3: Oscillator = Oscillator();
-    /*var oscillator = OperationGenerator { parameters in
-           returnAKOperation.sawtoothWave(frequency: GeneratorSource.frequency)
-    )*/
-    var mixer: Mixer=Mixer();
+  var sampleRate: Int = 48000;
+  var isPlaying: Bool = false;
+  var oscillator: AKOscillator = AKOscillator();
+  var mixer: AKMixer?;
 
   public static func register(with registrar: FlutterPluginRegistrar) {
     /*let instance =*/ _ = SwiftSoundGeneratorPlugin(registrar: registrar)
@@ -26,14 +17,11 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
 
   public init(registrar: FlutterPluginRegistrar) {
     super.init()
-    //self.mixer = Mixer()
-    //self.mixer.init()
-    //self.oscillator.init(waveform:Table(.triangle))
-    self.mixer.addInput(osc)
-    self.mixer.volume = 1.0
-    Settings.disableAVAudioSessionCategoryManagement = true
-    //Settings.disableAudioSessionDeactivationOnStop = true
-    engine.output = self.mixer
+    self.mixer = AKMixer(self.oscillator)
+    self.mixer!.volume = 1.0
+    AKSettings.disableAVAudioSessionCategoryManagement = true
+    AKSettings.disableAudioSessionDeactivationOnStop = true
+    AKManager.output = self.mixer!
     let methodChannel = FlutterMethodChannel(name: "sound_generator", binaryMessenger: registrar.messenger())
     self.onChangeIsPlaying = BetterEventChannel(name: "io.github.mertguner.sound_generator/onChangeIsPlaying", messenger: registrar.messenger())
     self.onOneCycleDataHandler = BetterEventChannel(name: "io.github.mertguner.sound_generator/onOneCycleDataHandler", messenger: registrar.messenger())
@@ -45,16 +33,14 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
       case "init":
         //let args = call.arguments as! [String: Any]
         //let sampleRate = args["sampleRate"] as Int
-        self.osc.frequency = 400
-        
-        
+        self.oscillator.frequency = 400
         do {
-            try engine.start()
+            try AKManager.start()
             result(true);
         } catch {
             result(FlutterError(
                 code: "init_error",
-                message: "Unable to start engine",
+                message: "Unable to start AKManager",
                 details: ""))
         }
         break
@@ -62,12 +48,12 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         result(nil);
         break;
       case "play":
-        self.osc.start()
+        self.oscillator.start()
         onChangeIsPlaying!.sendEvent(event: true)
         result(nil);
         break;
       case "stop":
-        self.osc.stop();
+        self.oscillator.stop();
         onChangeIsPlaying!.sendEvent(event: false)
         result(nil);
         break;
@@ -79,41 +65,10 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         break;
       case "setFrequency":
         let args = call.arguments as! [String: Any]
-        self.osc.frequency = args["frequency"] as! Float
+        self.oscillator.frequency = args["frequency"] as! Double
         result(nil);
         break;
       case "setWaveform":
-        let args = call.arguments as! [String: Any]
-        let waveType = args["waveType"] as! String
-        print(waveType)
-        switch waveType{
-          case "0":
-            //self.osc = osc(waveform: Table(.sine));
-            self.mixer.removeAllInputs()
-            self.mixer.addInput(self.osc)
-            //engine.output = self.mixer!
-            break;
-          case "1":
-            //self.osc = Oscillator(waveform: Table(.sawtooth));
-            self.mixer.removeAllInputs()
-            self.mixer.addInput(self.osc)
-            //engine.output = self.mixer!
-            break;
-          case "2":
-            //self.osc = Oscillator(waveform: Table(.triangle));
-            self.mixer.removeAllInputs()
-            self.mixer.addInput(self.osc)
-            //engine.output = self.mixer!
-            break;
-          
-          default:
-            //self.osc = Oscillator(waveform: Table(.square));
-            self.mixer.removeAllInputs()
-            self.mixer.addInput(self.osc)
-            //engine.output = self.mixer!
-            break;
-            
-        }
         result(nil);
         break;
       case "setBalance":
@@ -121,7 +76,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         break;
       case "setVolume":
         let args = call.arguments as! [String: Any]
-        self.mixer.volume = args["volume"] as! Float
+        self.mixer!.volume = args["volume"] as! Double
         result(nil);
         break;
       case "getSampleRate":
