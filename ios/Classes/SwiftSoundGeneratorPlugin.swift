@@ -75,15 +75,15 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         break;
       case "setWaveform":
         let args = call.arguments as! [String: Any]
-        let waveType = args["waveType"] as! Int
+        let waveType = args["waveType"] as! String
         switch waveType{
-          case 0:
+          case "0":
             self.oscillator = AKOscillator(waveform: AKTable(.sine));
             break;
-          case 1:
+          case "1":
             self.oscillator = AKOscillator(waveform: AKTable(.sawtooth));
             break;
-          case 2:
+          case "2":
             self.oscillator = AKOscillator(waveform: AKTable(.triangle));
             break;
           
