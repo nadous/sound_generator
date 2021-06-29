@@ -6,6 +6,8 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   var onChangeIsPlaying: BetterEventChannel?;
   var onOneCycleDataHandler: BetterEventChannel?;
   // This is not used yet.
+    let engine = AudioEngine()
+
     var sampleRate: Int = 48000;
     var isPlaying: Bool = false;
     var oscillator: Oscillator = Oscillator(waveform: Table(.sine));
@@ -26,7 +28,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     self.mixer!.volume = 1.0
     Settings.disableAVAudioSessionCategoryManagement = true
     Settings.disableAudioSessionDeactivationOnStop = true
-    Manager.output = self.mixer!
+    engine.output = self.mixer!
     let methodChannel = FlutterMethodChannel(name: "sound_generator", binaryMessenger: registrar.messenger())
     self.onChangeIsPlaying = BetterEventChannel(name: "io.github.mertguner.sound_generator/onChangeIsPlaying", messenger: registrar.messenger())
     self.onOneCycleDataHandler = BetterEventChannel(name: "io.github.mertguner.sound_generator/onOneCycleDataHandler", messenger: registrar.messenger())
@@ -40,12 +42,12 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         //let sampleRate = args["sampleRate"] as Int
         self.oscillator.frequency = 400
         do {
-            try Manager.start()
+            try engine.start()
             result(true);
         } catch {
             result(FlutterError(
                 code: "init_error",
-                message: "Unable to start Manager",
+                message: "Unable to start engine",
                 details: ""))
         }
         break
@@ -82,26 +84,26 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             //self.oscillator = Oscillator(waveform: Table(.sine));
             self.mixer.removeAllInputs()
             self.mixer(self.oscillator2)
-            //Manager.output = self.mixer!
+            //engine.output = self.mixer!
             break;
           case "1":
             //self.oscillator = Oscillator(waveform: Table(.sawtooth));
             self.mixer.removeAllInputs()
             self.mixer(self.oscillator2)
-            //Manager.output = self.mixer!
+            //engine.output = self.mixer!
             break;
           case "2":
             //self.oscillator = Oscillator(waveform: Table(.triangle));
             self.mixer.removeAllInputs()
             self.mixer(self.oscillator2)
-            //Manager.output = self.mixer!
+            //engine.output = self.mixer!
             break;
           
           default:
             //self.oscillator = Oscillator(waveform: Table(.square));
             self.mixer.removeAllInputs()
             self.mixer(self.oscillator2)
-            //Manager.output = self.mixer!
+            //engine.output = self.mixer!
             break;
             
         }
