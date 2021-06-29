@@ -9,8 +9,8 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     var sampleRate: Int = 48000;
     var isPlaying: Bool = false;
     var oscillator: AKOscillator = AKOscillator(waveform: AKTable(.sine));
-    //var oscillator2: AKOscillator = AKOscillator(waveform: AKTable(.triangle));
-    //var oscillator3: AKOscillator = AKOscillator(waveform: AKTable(.square));
+    var oscillator2: AKOscillator = AKOscillator(waveform: AKTable(.triangle));
+    var oscillator3: AKOscillator = AKOscillator(waveform: AKTable(.square));
     /*var oscillator = AKOperationGenerator { parameters in
            returnAKOperation.sawtoothWave(frequency: GeneratorSource.frequency)
     )*/
@@ -79,25 +79,29 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         print(waveType)
         switch waveType{
           case "0":
-            self.oscillator = AKOscillator(waveform: AKTable(.sine));
-            self.mixer = AKMixer(self.oscillator)
-            AKManager.output = self.mixer!
+            //self.oscillator = AKOscillator(waveform: AKTable(.sine));
+            self.mixer.removeAllInputs()
+            self.mixer(self.oscillator2)
+            //AKManager.output = self.mixer!
             break;
           case "1":
-            self.oscillator = AKOscillator(waveform: AKTable(.sawtooth));
-            self.mixer = AKMixer(self.oscillator)
-            AKManager.output = self.mixer!
+            //self.oscillator = AKOscillator(waveform: AKTable(.sawtooth));
+            self.mixer.removeAllInputs()
+            self.mixer(self.oscillator2)
+            //AKManager.output = self.mixer!
             break;
           case "2":
-            self.oscillator = AKOscillator(waveform: AKTable(.triangle));
-            self.mixer = AKMixer(self.oscillator)
-            AKManager.output = self.mixer!
+            //self.oscillator = AKOscillator(waveform: AKTable(.triangle));
+            self.mixer.removeAllInputs()
+            self.mixer(self.oscillator2)
+            //AKManager.output = self.mixer!
             break;
           
           default:
-            self.oscillator = AKOscillator(waveform: AKTable(.square));
-            self.mixer = AKMixer(self.oscillator)
-            AKManager.output = self.mixer!
+            //self.oscillator = AKOscillator(waveform: AKTable(.square));
+            self.mixer.removeAllInputs()
+            self.mixer(self.oscillator2)
+            //AKManager.output = self.mixer!
             break;
             
         }
