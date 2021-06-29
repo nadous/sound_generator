@@ -1,6 +1,7 @@
 import Flutter
 import UIKit
 import AudioKit
+import SoundpipeAudioKit
 //import Sound
 
 public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
