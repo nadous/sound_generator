@@ -12,9 +12,9 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
 
     var sampleRate: Int = 48000;
     var isPlaying: Bool = false;
-    var oscillator: Oscillator = Oscillator();
-    var oscillator2: Oscillator = Oscillator();
-    var oscillator3: Oscillator = Oscillator();
+    var osc: Oscillator = Oscillator();
+    var osc2: Oscillator = Oscillator();
+    var osc3: Oscillator = Oscillator();
     /*var oscillator = OperationGenerator { parameters in
            returnAKOperation.sawtoothWave(frequency: GeneratorSource.frequency)
     )*/
@@ -29,7 +29,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     //self.mixer = Mixer()
     //self.mixer.init()
     //self.oscillator.init(waveform:Table(.triangle))
-    self.mixer.addInput(oscillator)
+    self.mixer.addInput(osc)
     self.mixer.volume = 1.0
     Settings.disableAVAudioSessionCategoryManagement = true
     //Settings.disableAudioSessionDeactivationOnStop = true
@@ -45,7 +45,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
       case "init":
         //let args = call.arguments as! [String: Any]
         //let sampleRate = args["sampleRate"] as Int
-        self.oscillator.frequency = 400
+        self.osc.frequency = 400
         do {
             try engine.start()
             result(true);
@@ -60,12 +60,12 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         result(nil);
         break;
       case "play":
-        self.oscillator.start()
+        self.osc.start()
         onChangeIsPlaying!.sendEvent(event: true)
         result(nil);
         break;
       case "stop":
-        self.oscillator.stop();
+        self.osc.stop();
         onChangeIsPlaying!.sendEvent(event: false)
         result(nil);
         break;
@@ -77,7 +77,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         break;
       case "setFrequency":
         let args = call.arguments as! [String: Any]
-        self.oscillator.frequency = args["frequency"] as! Float
+        self.osc.frequency = args["frequency"] as! Float
         result(nil);
         break;
       case "setWaveform":
@@ -86,28 +86,28 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         print(waveType)
         switch waveType{
           case "0":
-            //self.oscillator = Oscillator(waveform: Table(.sine));
+            //self.osc = osc(waveform: Table(.sine));
             self.mixer.removeAllInputs()
-            self.mixer.addInput(self.oscillator2)
+            self.mixer.addInput(self.osc2)
             //engine.output = self.mixer!
             break;
           case "1":
-            //self.oscillator = Oscillator(waveform: Table(.sawtooth));
+            //self.osc = Oscillator(waveform: Table(.sawtooth));
             self.mixer.removeAllInputs()
-            self.mixer.addInput(self.oscillator2)
+            self.mixer.addInput(self.osc2)
             //engine.output = self.mixer!
             break;
           case "2":
-            //self.oscillator = Oscillator(waveform: Table(.triangle));
+            //self.osc = Oscillator(waveform: Table(.triangle));
             self.mixer.removeAllInputs()
-            self.mixer.addInput(self.oscillator2)
+            self.mixer.addInput(self.osc2)
             //engine.output = self.mixer!
             break;
           
           default:
-            //self.oscillator = Oscillator(waveform: Table(.square));
+            //self.osc = Oscillator(waveform: Table(.square));
             self.mixer.removeAllInputs()
-            self.mixer.addInput(self.oscillator2)
+            self.mixer.addInput(self.osc2)
             //engine.output = self.mixer!
             break;
             
