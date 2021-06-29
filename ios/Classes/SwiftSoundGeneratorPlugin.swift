@@ -83,7 +83,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
           case "0":
             //self.oscillator = Oscillator(waveform: Table(.sine));
             self.mixer.removeAllInputs()
-            self.mixer(self.oscillator2)
+            self.mixer.addInput(self.oscillator2)
             //engine.output = self.mixer!
             break;
           case "1":
