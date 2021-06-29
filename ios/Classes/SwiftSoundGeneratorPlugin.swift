@@ -81,7 +81,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             self.mixer = AKMixer(self.oscillator2)
             break;
           case 2:
-            self.mixer = AKMixer(self.oscillato3)
+            self.mixer = AKMixer(self.oscillator3)
             break;
           
           default:
