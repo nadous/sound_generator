@@ -1,7 +1,7 @@
 import Flutter
 import UIKit
 import AudioKit
-import Sound
+//import Sound
 
 public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   var onChangeIsPlaying: BetterEventChannel?;
