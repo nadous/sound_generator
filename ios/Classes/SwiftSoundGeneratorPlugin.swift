@@ -69,7 +69,25 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         result(nil);
         break;
       case "setWaveform":
-        result(nil);
+        let args = call.arguments as! [String: Any]
+        let waveType= args["waveType"] as! Integer
+        switch waveType
+          case 0:
+            self.oscillator.waveform= .triangle
+            break;
+          case 1:
+            self.oscillator.waveform= .sine
+            break;
+          case 2:
+            self.oscillator.waveform= .square
+            break;
+          case 3:
+            self.oscillator.waveform= .square
+            break;
+          default:
+            break;
+     
+            result(nil);
         break;
       case "setBalance":
         result(nil);
