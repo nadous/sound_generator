@@ -8,12 +8,12 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   // This is not used yet.
     var sampleRate: Int = 48000;
     var isPlaying: Bool = false;
-    //var oscillator: AKOscillator = AKOscillator(waveform: AKTable(.sine));
+    var oscillator: AKOscillator = AKOscillator(waveform: AKTable(.sine));
     //var oscillator2: AKOscillator = AKOscillator(waveform: AKTable(.triangle));
     //var oscillator3: AKOscillator = AKOscillator(waveform: AKTable(.square));
-    var oscillator = AKOperationGenerator { parameters in
+    /*var oscillator = AKOperationGenerator { parameters in
            returnAKOperation.sawtoothWave(frequency: GeneratorSource.frequency)
-    )
+    )*/
     var mixer: AKMixer?;
 
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -78,17 +78,17 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         let waveType = args["waveType"] as! Int
         switch waveType{
           case 0:
-            self.mixer = AKMixer(self.oscillator)
+            self.oscillator = AKOscillator(waveform: AKTable(.sine));
             break;
           case 1:
-            self.mixer = AKMixer(self.oscillator2)
+            self.oscillator = AKOscillator(waveform: AKTable(.sawtooth));
             break;
           case 2:
-            self.mixer = AKMixer(self.oscillator3)
+            self.oscillator = AKOscillator(waveform: AKTable(.triangle));
             break;
           
           default:
-            self.mixer = AKMixer(self.oscillator3)
+            self.oscillator = AKOscillator(waveform: AKTable(.square));
             break;
             
         }
