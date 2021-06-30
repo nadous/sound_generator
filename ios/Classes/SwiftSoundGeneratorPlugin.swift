@@ -10,7 +10,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   var isPlaying: Bool = false;
   var oscillator: AKOscillator = AKOscillator();
   var oscillator2: AKOscillator = AKOscillator(waveform:AKTable(.triangle));
-  var oscillator2: AKOscillator = AKOscillator(waveform:AKTable(.square));
+  var oscillator3: AKOscillator = AKOscillator(waveform:AKTable(.square));
   var mixer: AKMixer?;
 
   public static func register(with registrar: FlutterPluginRegistrar) {
