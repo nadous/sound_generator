@@ -59,6 +59,8 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         break;
       case "stop":
         self.oscillator.stop();
+        self.squareOsc.stop();
+        self.triangleOsc.stop();
         onChangeIsPlaying!.sendEvent(event: false)
         result(nil);
         break;
@@ -71,6 +73,8 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
       case "setFrequency":
         let args = call.arguments as! [String: Any]
         self.oscillator.frequency = args["frequency"] as! Double
+        self.squareOsc.frequency = args["frequency"] as! Double
+        self.triangleOsc.frequency = args["frequency"] as! Double
         result(nil);
         break;
       case "setWaveform":
