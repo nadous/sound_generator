@@ -52,7 +52,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         break;
       case "play":
         self.oscillator.start()
-        self.oscillator2.start()
+        //self.oscillator2.start()
         onChangeIsPlaying!.sendEvent(event: true)
         result(nil);
         break;
@@ -73,6 +73,8 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         result(nil);
         break;
       case "setWaveform":
+        self.oscillator2.start();
+        self.oscillator.stop();
         result(nil);
         break;
       case "setBalance":
