@@ -77,12 +77,12 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         let args = call.arguments as! [String: Any]
         let waveType = args["waveType"] as! String
         switch waveType {
-        case 'SQUAREWAVE':
+        case "SQUAREWAVE":
             self.squareOsc.start();
             self.oscillator.stop();
             self.triangleOsc.stop();
         
-        case 'TRIANGLE':
+        case "TRIANGLE":
             
             self.squareOsc.stop();
             self.oscillator.stop();
