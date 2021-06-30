@@ -9,8 +9,8 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
   var sampleRate: Int = 48000;
   var isPlaying: Bool = false;
   var oscillator: AKOscillator = AKOscillator();
-  var oscillator2: AKOscillator = AKOscillator(waveform:AKTable(.triangle));
-  var oscillator3: AKOscillator = AKOscillator(waveform:AKTable(.square));
+  var triangleOsc: AKOscillator = AKOscillator(waveform:AKTable(.triangle));
+  var squareOsc: AKOscillator = AKOscillator(waveform:AKTable(.square));
   var mixer: AKMixer?;
 
   public static func register(with registrar: FlutterPluginRegistrar) {
@@ -19,7 +19,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
 
   public init(registrar: FlutterPluginRegistrar) {
     super.init()
-    self.mixer = AKMixer(self.oscillator,self.oscillator2)
+    self.mixer = AKMixer(self.oscillator,self.squareOsc,self.triangleOsc)
     self.mixer!.volume = 1.0
     AKSettings.disableAVAudioSessionCategoryManagement = true
     AKSettings.disableAudioSessionDeactivationOnStop = true
@@ -36,7 +36,8 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         //let args = call.arguments as! [String: Any]
         //let sampleRate = args["sampleRate"] as Int
         self.oscillator.frequency = 400
-        self.oscillator2.frequency = 800
+        self.triangleOsc.frequency = 400
+        self.squareOsc.frequency = 400
         do {
             try AKManager.start()
             result(true);
@@ -73,8 +74,27 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         result(nil);
         break;
       case "setWaveform":
-        self.oscillator2.start();
-        self.oscillator.stop();
+        let args = call.arguments as! [String: Any]
+        let waveType = args["waveType"] as! String
+        switch waveType {
+        case 'SQUAREWAVE':
+            self.squareOsc.start();
+            self.oscillator.stop();
+            self.triangleOsc.stop();
+        
+        case 'TRIANGLE':
+            
+            self.squareOsc.stop();
+            self.oscillator.stop();
+            self.triangleOsc.start();
+            
+        
+        default:
+            self.squareOsc.stop();
+            self.oscillator.start();
+            self.triangleOsc.stop();
+        }
+        
         result(nil);
         break;
       case "setBalance":
