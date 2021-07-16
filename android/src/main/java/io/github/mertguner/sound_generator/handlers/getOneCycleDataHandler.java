@@ -9,9 +9,8 @@ public class getOneCycleDataHandler implements EventChannel.StreamHandler {
     private volatile static getOneCycleDataHandler mEventManager;
     EventChannel.EventSink eventSink;
 
-    public getOneCycleDataHandler()
-    {
-        if(mEventManager == null)
+    public getOneCycleDataHandler() {
+        if (mEventManager == null)
             mEventManager = this;
     }
 
@@ -23,8 +22,9 @@ public class getOneCycleDataHandler implements EventChannel.StreamHandler {
     public static void setData(List<Integer> value) {
         if (mEventManager != null)
             if (mEventManager.eventSink != null)
-                    mEventManager.eventSink.success(value);
+                mEventManager.eventSink.success(value);
     }
+
     @Override
     public void onCancel(Object o) {
         if (this.eventSink != null) {

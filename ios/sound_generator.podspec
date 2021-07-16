@@ -19,7 +19,7 @@ A new Flutter plugin.
   # TODO: We actually require >=4.11.1 and <5
   s.dependency 'AudioKit'
   s.static_framework = true
-  s.platform = :ios, '12.0'
+  s.platform = :ios, '10.0'
 
   # # Flutter.framework does not contain a i386 slice.
   # s.pod_target_xcconfig = { 'DEFINES_MODULE' => 'YES', 'EXCLUDED_ARCHS[sdk=iphonesimulator*]' => 'i386' }

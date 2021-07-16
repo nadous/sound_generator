@@ -8,9 +8,8 @@ public class isPlayingStreamHandler implements StreamHandler {
     private volatile static isPlayingStreamHandler mEventManager;
     EventSink eventSink;
 
-    public isPlayingStreamHandler()
-    {
-        if(mEventManager == null)
+    public isPlayingStreamHandler() {
+        if (mEventManager == null)
             mEventManager = this;
     }
 
@@ -20,9 +19,8 @@ public class isPlayingStreamHandler implements StreamHandler {
     }
 
     public static void change(boolean value) {
-        if(mEventManager != null)
-        if (mEventManager.eventSink != null)
-            mEventManager.eventSink.success(Boolean.valueOf(value));
+        if (mEventManager != null && mEventManager.eventSink != null)
+            mEventManager.eventSink.success(value);
     }
 
     @Override

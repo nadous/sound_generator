@@ -6,6 +6,8 @@ import android.media.AudioManager;
 import android.media.AudioTrack;
 import android.os.Build;
 
+import java.util.List;
+
 import io.github.mertguner.sound_generator.generators.sawtoothGenerator;
 import io.github.mertguner.sound_generator.generators.signalDataGenerator;
 import io.github.mertguner.sound_generator.generators.sinusoidalGenerator;
@@ -18,6 +20,7 @@ import io.github.mertguner.sound_generator.models.WaveTypes;
 public class SoundGenerator {
 
     private Thread bufferThread;
+    private List<AudioTrack> audioTracks;
     private AudioTrack audioTrack;
     private signalDataGenerator generator;
     private boolean isPlaying = false;
@@ -62,17 +65,20 @@ public class SoundGenerator {
 
         rightVolume = (balance >= 0) ? 1 : (balance == -1) ? 0 : (1 + balance);
         leftVolume = (balance <= 0) ? 1 : (balance == 1) ? 0 : (1 - balance);
-        if (audioTrack != null) {
-            audioTrack.setStereoVolume(leftVolume, rightVolume);
+        if (audioTracks != null) {
+            for (int i = 0; i < audioTracks.size(); ++i) {
+                audioTracks.get(i).setStereoVolume(leftVolume, rightVolume);
+            }
         }
     }
 
 
     public void setVolume(float volume) {
         volume = Math.max(0, Math.min(1, volume));
-
-        if (audioTrack != null) {
-            audioTrack.setStereoVolume(leftVolume * volume, rightVolume * volume);
+        if (audioTracks != null) {
+            for (int i = 0; i < audioTracks.size(); ++i) {
+                audioTracks.get(i).setStereoVolume(leftVolume * volume, rightVolume * volume);
+            }
         }
     }
 
@@ -101,17 +107,16 @@ public class SoundGenerator {
 
             generator = new signalDataGenerator(minSamplesSize, sampleRate);
 
-            audioTrack = new AudioTrack(
-                    AudioManager.STREAM_MUSIC,
-                    sampleRate,
-                    AudioFormat.CHANNEL_OUT_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT,
-                    minSamplesSize,
-                    AudioTrack.MODE_STREAM);
+//            audioTrack = new AudioTrack(
+//                    AudioManager.STREAM_MUSIC,
+//                    sampleRate,
+//                    AudioFormat.CHANNEL_OUT_MONO,
+//                    AudioFormat.ENCODING_PCM_16BIT,
+//                    minSamplesSize,
+//                    AudioTrack.MODE_STREAM);
 
             return true;
-        }catch (Exception ex)
-        {
+        } catch (Exception ex) {
             return false;
         }
     }
@@ -129,6 +134,7 @@ public class SoundGenerator {
             @Override
             public void run() {
                 audioTrack.flush();
+                print(audioTrack.)
                 audioTrack.setPlaybackHeadPosition(0);
                 audioTrack.play();
                 while (isPlaying) {
