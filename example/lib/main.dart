@@ -2,7 +2,6 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:sound_generator/sound_generator.dart';
-import 'package:sound_generator/waveTypes.dart';
 
 void main() {
   runApp(MyApp());
@@ -47,12 +46,12 @@ class MyPainter extends CustomPainter {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isPlaying = false;
-  double frequency = 20;
+  Map<String, bool> oscillators = {'440': false, '880': false, '1000': false};
+
   double balance = 0;
   double volume = 1;
-  waveTypes waveType = waveTypes.SINUSOIDAL;
-  int sampleRate = 96000;
+  WaveForm waveForm = WaveForm.sine;
+
   List<int> oneCycleData;
 
   @override
@@ -86,66 +85,27 @@ class _MyAppState extends State<MyApp> {
                             )
                           : Container()),
                   SizedBox(height: 2),
-                  Text("A Cycle Data Length is " + (sampleRate / this.frequency).round().toString() + " on sample rate " + sampleRate.toString()),
+                  Divider(color: Colors.red),
                   SizedBox(height: 5),
-                  Divider(
-                    color: Colors.red,
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: List.generate(oscillators.length, (index) {
+                      final uid = oscillators.keys.elementAt(index);
+                      final isPlaying = oscillators.values.elementAt(index);
+
+                      return CircleAvatar(
+                        radius: 30,
+                        backgroundColor: Colors.lightBlueAccent,
+                        child: IconButton(
+                            icon: Icon(isPlaying ? Icons.stop : Icons.play_arrow),
+                            onPressed: () {
+                              isPlaying ? SoundGenerator.stop(uid) : SoundGenerator.play(uid, double.tryParse(uid) ?? 440.0);
+                            }),
+                      );
+                    }),
                   ),
                   SizedBox(height: 5),
-                  CircleAvatar(
-                      radius: 30,
-                      backgroundColor: Colors.lightBlueAccent,
-                      child: IconButton(
-                          icon: Icon(isPlaying ? Icons.stop : Icons.play_arrow),
-                          onPressed: () {
-                            isPlaying ? SoundGenerator.stop() : SoundGenerator.play();
-                          })),
-                  SizedBox(height: 5),
-                  Divider(
-                    color: Colors.red,
-                  ),
-                  SizedBox(height: 5),
-                  Text("Wave Form"),
-                  Center(
-                      child: DropdownButton<waveTypes>(
-                          value: this.waveType,
-                          onChanged: (waveTypes newValue) {
-                            setState(() {
-                              this.waveType = newValue;
-                              SoundGenerator.setWaveType(this.waveType);
-                            });
-                          },
-                          items: waveTypes.values.map((waveTypes classType) {
-                            return DropdownMenuItem<waveTypes>(value: classType, child: Text(classType.toString().split('.').last));
-                          }).toList())),
-                  SizedBox(height: 5),
-                  Divider(
-                    color: Colors.red,
-                  ),
-                  SizedBox(height: 5),
-                  Text("Frequency"),
-                  Container(
-                      width: double.infinity,
-                      height: 40,
-                      child: Row(mainAxisAlignment: MainAxisAlignment.center, crossAxisAlignment: CrossAxisAlignment.stretch, children: <Widget>[
-                        Expanded(
-                          flex: 2,
-                          child: Center(child: Text(this.frequency.toStringAsFixed(2) + " Hz")),
-                        ),
-                        Expanded(
-                          flex: 8, // 60%
-                          child: Slider(
-                              min: 20,
-                              max: 10000,
-                              value: this.frequency,
-                              onChanged: (_value) {
-                                setState(() {
-                                  this.frequency = _value.toDouble();
-                                  SoundGenerator.setFrequency(this.frequency);
-                                });
-                              }),
-                        )
-                      ])),
+                  Divider(color: Colors.red),
                   SizedBox(height: 5),
                   Text("Balance"),
                   Container(
@@ -206,13 +166,13 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    isPlaying = false;
+    // isPlaying = false;
 
-    SoundGenerator.init(sampleRate);
+    // SoundGenerator.init(sampleRate);
 
     SoundGenerator.onIsPlayingChanged.listen((value) {
       setState(() {
-        isPlaying = value;
+        oscillators[value["uid"]] = value["is_playing"];
       });
     });
 

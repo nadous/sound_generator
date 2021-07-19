@@ -1,5 +1,7 @@
 name: sound_generator
-description: This plugin is a procedural sound generator. It provides fluidly sound transitions in frequency changes. You can see real signal shape with one Cycle snapshot properties
+description: This plugin is a procedural sound generator. It provides fluidly
+  sound transitions in frequency changes. You can see real signal shape with one
+  Cycle snapshot properties
 version: 0.0.5
 author: Mert Güner <m.mertguner@gmail.com>
 homepage: https://github.com/mertguner/sound_generator.git
@@ -11,6 +13,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  enum_to_string: ^2.0.1
 
 dev_dependencies:
   flutter_test:
@@ -18,7 +21,6 @@ dev_dependencies:
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
-
 # The following section is specific to Flutter.
 flutter:
   # This section identifies this Flutter project as a plugin project.
@@ -32,7 +34,6 @@ flutter:
         pluginClass: SoundGeneratorPlugin
       ios:
         pluginClass: SoundGeneratorPlugin
-
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -43,7 +44,6 @@ flutter:
   #
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
-
   # To add custom fonts to your plugin package, add a fonts section here,
   # in this "flutter" section. Each entry in this list should have a
   # "family" key with the font family name, and a "fonts" key with a

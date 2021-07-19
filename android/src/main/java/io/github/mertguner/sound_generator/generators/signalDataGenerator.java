@@ -8,7 +8,7 @@ import io.github.mertguner.sound_generator.handlers.getOneCycleDataHandler;
 public class signalDataGenerator {
     private final float _2Pi = 2.0f * (float) Math.PI;
 
-    private int sampleRate = 48000;
+    private int sampleRate = 44100;
     private float phCoefficient = _2Pi / (float) sampleRate;
     private float smoothStep = 1f / (float) sampleRate * 20f;
 
