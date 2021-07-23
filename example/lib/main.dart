@@ -99,7 +99,7 @@ class _MyAppState extends State<MyApp> {
                         child: IconButton(
                             icon: Icon(isPlaying ? Icons.stop : Icons.play_arrow),
                             onPressed: () {
-                              isPlaying ? SoundGenerator.stop(uid) : SoundGenerator.play(uid, double.tryParse(uid) ?? 440.0);
+                              isPlaying ? SoundGenerator.stop(uid) : SoundGenerator.start(uid, double.tryParse(uid) ?? 440.0);
                             }),
                       );
                     }),

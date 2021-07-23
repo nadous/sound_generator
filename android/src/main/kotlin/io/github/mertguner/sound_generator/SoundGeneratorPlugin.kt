@@ -25,19 +25,17 @@ class SoundGeneratorPlugin : FlutterPlugin, MethodCallHandler {
         onChangeIsPlaying.setStreamHandler(IsPlayingStreamHandler())
         val onOneCycleDataHandler = EventChannel(flutterPluginBinding.binaryMessenger, GetOneCycleDataHandler.NATIVE_CHANNEL_EVENT)
         onOneCycleDataHandler.setStreamHandler(GetOneCycleDataHandler())
-
-        soundGenerator.init()
     }
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
-//        if
+
         when (call.method) {
             "release" -> soundGenerator.release()
-            "play" -> {
-                val uid = call.argument<String>("uid")
+            "start" -> {
+                val uid = call.argument<String>("uid")!!
                 val frequency = call.argument<Double>("frequency")!!
                 val waveForm = call.argument<String>("wave_form")
-                soundGenerator.play(uid!!, frequency.toFloat(), waveForm)
+                soundGenerator.play(uid, frequency.toFloat(), waveForm)
             }
             "stop" -> {
                 val uid = call.argument<String>("uid")
@@ -55,6 +53,12 @@ class SoundGeneratorPlugin : FlutterPlugin, MethodCallHandler {
             "set_volume" -> {
                 val volume = call.argument<Double>("volume")!!
                 soundGenerator.volume = volume.toFloat()
+            }
+            "set_frequency" -> {
+                val uid = call.argument<String>("uid")!!
+                val frequency = call.argument<Double>("frequency")!!
+
+                soundGenerator.setFrequency(uid, frequency.toFloat())
             }
             "set_sample_rate" -> {
                 val sampleRate = call.argument<Int>("sample_rate")!!

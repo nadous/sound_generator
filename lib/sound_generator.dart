@@ -36,13 +36,16 @@ class SoundGenerator {
   }
 
   /// Play sound
-  static Future<void> play(String uid, double frequency, {WaveForm waveForm = WaveForm.sine}) => _channel.invokeMethod(
-        'play',
+  static Future<void> start(String uid, double frequency, {WaveForm waveForm = WaveForm.sine}) => _channel.invokeMethod(
+        'start',
         {'uid': uid, 'frequency': frequency, 'wave_form': EnumToString.convertToString(waveForm)},
       );
 
   /// Stop playing sound
   static void stop(String uid) => _channel.invokeMethod('stop', {"uid": uid});
+
+  /// Change frequency of given sound
+  static void setFrequency(String uid, double frequency) => _channel.invokeMethod('set_frequency', {'uid': uid, 'frequency': frequency});
 
   /// Release all data
   static void release() => _channel.invokeMethod('release');

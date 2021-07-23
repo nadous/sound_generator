@@ -5,11 +5,9 @@ import android.media.AudioFormat
 import android.media.AudioTrack
 import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import io.github.mertguner.sound_generator.generators.*
 import io.github.mertguner.sound_generator.handlers.IsPlayingStreamHandler
 import java.util.*
-import kotlin.math.sin
 
 internal enum class WaveForms {
     square, triangle, sawtooth, sine;
@@ -36,9 +34,9 @@ internal enum class WaveForms {
 }
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-class SoundGenerator {
-    //    private var bufferThread: Thread? = null
-    private val signals = HashMap<String, SignalGenerator>()
+class SoundGenerator() {
+
+    private val signals = HashMap<String, SignalPlayer>()
     private var sampleSize = 0
 
     var sampleRate: Int = 44100
@@ -69,8 +67,7 @@ class SoundGenerator {
     }
 
     fun play(uid: String, frequency: Float, waveForm: String?) {
-
-        val signal = SignalGenerator(WaveForms.toGenerator(WaveForms.fromString(waveForm)), sampleSize, sampleRate, frequency)
+        val signal = SignalPlayer(WaveForms.toGenerator(WaveForms.fromString(waveForm)), sampleSize, sampleRate, frequency)
         signal.playing = true
         signals[uid] = signal
 
@@ -87,10 +84,16 @@ class SoundGenerator {
 
         signals[uid]!!.playing = false
         signals.remove(uid)
+
         val res = HashMap<String?, Any?>()
         res["uid"] = uid
         res["is_playing"] = false
         IsPlayingStreamHandler.change(res)
+    }
+
+    fun setFrequency(uid: String, frequency: Float) {
+        if (!signals.containsKey(uid)) return
+        signals[uid]!!.frequency = frequency
     }
 
     fun setAutoUpdateOneCycleSample(autoUpdateOneCycleSample: Boolean) {
@@ -105,20 +108,6 @@ class SoundGenerator {
         }
     }
 
-
-    fun init(): Boolean {
-        return try {
-            sampleSize = AudioTrack.getMinBufferSize(
-                    sampleRate,
-                    AudioFormat.CHANNEL_OUT_MONO,
-                    AudioFormat.ENCODING_PCM_16BIT)
-
-            true
-        } catch (ex: Exception) {
-            false
-        }
-    }
-
     val playing: Boolean
         get() {
             for (uid in signals.keys) {
@@ -126,4 +115,9 @@ class SoundGenerator {
             }
             return false
         }
+
+    init {
+        Log.d("SoundGenerator", "init")
+        sampleSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
+    }
 }

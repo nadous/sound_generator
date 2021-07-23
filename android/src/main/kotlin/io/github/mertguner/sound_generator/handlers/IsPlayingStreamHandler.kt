@@ -6,11 +6,11 @@ import java.util.*
 
 class IsPlayingStreamHandler : EventChannel.StreamHandler {
     var eventSink: EventSink? = null
-    override fun onListen(o: Any, eventSink: EventSink) {
+    override fun onListen(o: Any?, eventSink: EventSink) {
         this.eventSink = eventSink
     }
 
-    override fun onCancel(o: Any) {
+    override fun onCancel(o: Any?) {
         if (eventSink != null) {
             eventSink!!.endOfStream()
             eventSink = null
