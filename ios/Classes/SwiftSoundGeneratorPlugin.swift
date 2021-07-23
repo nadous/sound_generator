@@ -5,7 +5,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     var onChangeIsPlaying: BetterEventChannel?
     var onOneCycleDataHandler: BetterEventChannel?
     
-    var waveType = AKTable(.sine)
+    var waveForm = AKTable(.sine)
     var sampleRate = 44100.0
     var volume = 1.0
     
@@ -16,8 +16,8 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         _ = SwiftSoundGeneratorPlugin(registrar: registrar)
     }
     
-    private func _stringToWaveForm(waveType:String) -> AKTable {
-        switch waveType {
+    private func _stringToWaveForm(waveForm:String) -> AKTable {
+        switch waveForm {
         case "square":
             return AKTable(.square)
             
@@ -34,11 +34,6 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     
     private func _stop() {
         _ = self.oscillators.map{$1.stop()}
-        //        for  oscillator in self.oscillators
-        //        {
-        //            oscillator.stop()
-        //        }
-        
         AKManager.disconnectAllInputs()
     }
     
@@ -77,7 +72,6 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         switch call.method {
         case "release":
             _stop()
-            
             result(nil);
             break;
         case "play":
@@ -85,7 +79,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             
             let uid = args["uid"] as! String
             let frequency = args["frequency"] as! Double
-            let waveForm = _stringToWaveForm(waveType: args["wave_form"] as! String )
+            let waveForm = _stringToWaveForm(waveForm: args["wave_form"] as! String )
             
             let oscillator = AKOscillator(waveform: waveForm)
             oscillator.frequency = frequency

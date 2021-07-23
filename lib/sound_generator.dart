@@ -35,12 +35,6 @@ class SoundGenerator {
     return _onGetOneCycleDataHandler;
   }
 
-  // /// init function
-  // static Future<bool> init(int sampleRate) async {
-  //   final bool init = await _channel.invokeMethod("init", {"sample_rate": sampleRate});
-  //   return init;
-  // }
-
   /// Play sound
   static Future<void> play(String uid, double frequency, {WaveForm waveForm = WaveForm.sine}) => _channel.invokeMethod(
         'play',

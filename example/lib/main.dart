@@ -52,7 +52,7 @@ class _MyAppState extends State<MyApp> {
   double volume = 1;
   WaveForm waveForm = WaveForm.sine;
 
-  List<int> oneCycleData;
+  List<int> ?oneCycleData;
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +81,7 @@ class _MyAppState extends State<MyApp> {
                       child: oneCycleData != null
                           ? CustomPaint(
                               //                       <-- CustomPaint widget
-                              painter: MyPainter(oneCycleData),
+                              painter: MyPainter(oneCycleData!),
                             )
                           : Container()),
                   SizedBox(height: 2),
@@ -166,11 +166,9 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    // isPlaying = false;
-
-    // SoundGenerator.init(sampleRate);
 
     SoundGenerator.onIsPlayingChanged.listen((value) {
+      print(value);
       setState(() {
         oscillators[value["uid"]] = value["is_playing"];
       });
@@ -183,7 +181,6 @@ class _MyAppState extends State<MyApp> {
     });
 
     SoundGenerator.setAutoUpdateOneCycleSample(true);
-    //Force update for one time
     SoundGenerator.refreshOneCycleData();
   }
 }
