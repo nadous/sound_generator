@@ -1,4 +1,4 @@
-package io.github.mertguner.sound_generator.handlers
+package io.github.mertguner.sound_generator
 
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.EventChannel.EventSink
@@ -21,7 +21,7 @@ class IsPlayingStreamHandler : EventChannel.StreamHandler {
         const val NATIVE_CHANNEL_EVENT = "io.github.mertguner.sound_generator/onChangeIsPlaying"
 
         private var mEventManager: IsPlayingStreamHandler? = null
-        fun change(value: HashMap<String?, Any?>?) {
+        fun change(value: HashMap<String, Any?>?) {
             if (mEventManager != null && mEventManager!!.eventSink != null) {
                 mEventManager!!.eventSink!!.success(value)
             }

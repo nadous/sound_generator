@@ -4,9 +4,7 @@ import android.annotation.TargetApi
 import android.media.AudioFormat
 import android.media.AudioTrack
 import android.os.Build
-import android.util.Log
 import io.github.mertguner.sound_generator.generators.*
-import io.github.mertguner.sound_generator.handlers.IsPlayingStreamHandler
 import java.util.*
 
 internal enum class WaveForms {
@@ -34,7 +32,7 @@ internal enum class WaveForms {
 }
 
 @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-class SoundGenerator() {
+class SoundGenerator {
 
     private val signals = HashMap<String, SignalPlayer>()
     private var sampleSize = 0
@@ -51,27 +49,36 @@ class SoundGenerator() {
         set(value) {
             field = value
             for (uid in signals.keys) {
-                signals[uid]!!.createOneCycleData(true)
+                signals[uid]!!.volume = value
             }
         }
 
+    val playing: Boolean
+        get() {
+            for (uid in signals.keys) {
+                if (signals[uid]!!.playing) return true
+            }
+            return false
+        }
 
     fun release() {
         for (uid in signals.keys) {
+            signals[uid]!!.playing = false
             signals.remove(uid)
-            val res = HashMap<String?, Any?>()
+
+            val res = HashMap<String, Any?>()
             res["uid"] = uid
             res["is_playing"] = false
             IsPlayingStreamHandler.change(res)
         }
     }
 
-    fun play(uid: String, frequency: Float, waveForm: String?) {
+    fun start(uid: String, frequency: Float, waveForm: String?) {
         val signal = SignalPlayer(WaveForms.toGenerator(WaveForms.fromString(waveForm)), sampleSize, sampleRate, frequency)
-        signal.playing = true
         signals[uid] = signal
+        signal.playing = true
 
-        val res = HashMap<String?, Any?>()
+        val res = HashMap<String, Any?>()
         res["uid"] = uid
         res["is_playing"] = true
         IsPlayingStreamHandler.change(res)
@@ -85,7 +92,7 @@ class SoundGenerator() {
         signals[uid]!!.playing = false
         signals.remove(uid)
 
-        val res = HashMap<String?, Any?>()
+        val res = HashMap<String, Any?>()
         res["uid"] = uid
         res["is_playing"] = false
         IsPlayingStreamHandler.change(res)
@@ -96,28 +103,7 @@ class SoundGenerator() {
         signals[uid]!!.frequency = frequency
     }
 
-    fun setAutoUpdateOneCycleSample(autoUpdateOneCycleSample: Boolean) {
-        for (uid in signals.keys) {
-            signals[uid]!!.setAutoUpdateOneCycleSample(autoUpdateOneCycleSample)
-        }
-    }
-
-    fun refreshOneCycleData() {
-        for (uid in signals.keys) {
-            signals[uid]!!.createOneCycleData(true)
-        }
-    }
-
-    val playing: Boolean
-        get() {
-            for (uid in signals.keys) {
-                if (signals[uid]!!.playing) return true
-            }
-            return false
-        }
-
     init {
-        Log.d("SoundGenerator", "init")
         sampleSize = AudioTrack.getMinBufferSize(sampleRate, AudioFormat.CHANNEL_OUT_MONO, AudioFormat.ENCODING_PCM_16BIT)
     }
 }

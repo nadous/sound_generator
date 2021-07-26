@@ -3,7 +3,6 @@ import AudioKit
 
 public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     var onChangeIsPlaying: BetterEventChannel?
-    var onOneCycleDataHandler: BetterEventChannel?
     
     var waveForm = AKTable(.sine)
     var sampleRate = 44100.0
@@ -40,7 +39,6 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     private func _startEngine() -> Bool {
         if !AKManager.engine.isRunning {
             do {
-                print("starting the engine")
                 try AKManager.start()
                 return true
             } catch  {
@@ -64,7 +62,6 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         
         let methodChannel = FlutterMethodChannel(name: "sound_generator", binaryMessenger: registrar.messenger())
         self.onChangeIsPlaying = BetterEventChannel(name: "io.github.mertguner.sound_generator/onChangeIsPlaying", messenger: registrar.messenger())
-        self.onOneCycleDataHandler = BetterEventChannel(name: "io.github.mertguner.sound_generator/onOneCycleDataHandler", messenger: registrar.messenger())
         registrar.addMethodCallDelegate(self, channel: methodChannel)
     }
     
@@ -74,7 +71,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             _stop()
             result(nil);
             break;
-        case "play":
+        case "start":
             let args = call.arguments as! [String: Any]
             
             let uid = args["uid"] as! String
@@ -118,20 +115,17 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             
             result(self.oscillators[uid]?.isPlaying ?? false)
             break;
-        case "set_auto_update_one_cycle_sample":
-            result(nil);
-            break;
-        case "set_balance":
-            let args = call.arguments as! [String: Any]
-            let balance = args["sample_rate"] as! Double
-            self.mixer?.pan = balance
-            
-            result(nil);
-            break;
         case "set_volume":
             let args = call.arguments as! [String: Any]
             self.volume = args["volume"] as! Double
             self.mixer!.volume = self.volume
+            
+            result(nil);
+            break;
+        case "set_frequency":
+            let args = call.arguments as! [String: Any]
+            let uid = args["uid"] as! String
+            let frequency = args["frequency"] as! Double
             
             result(nil);
             break;
@@ -144,9 +138,6 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             break;
         case "get_sample_rate":
             result(self.sampleRate);
-            break;
-        case "refresh_one_cycle_data":
-            result(nil);
             break;
         default:
             result(FlutterMethodNotImplemented);

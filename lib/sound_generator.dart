@@ -9,7 +9,6 @@ enum WaveForm { sine, square, triangle, sawtooth }
 class SoundGenerator {
   static const MethodChannel _channel = const MethodChannel('sound_generator');
   static const EventChannel _onChangeIsPlaying = const EventChannel('io.github.mertguner.sound_generator/onChangeIsPlaying');
-  static const EventChannel _onOneCycleDataHandler = const EventChannel('io.github.mertguner.sound_generator/onOneCycleDataHandler');
 
   /// is Playing data changed event
   static bool _onIsPlayingChangedInitialized = false;
@@ -23,17 +22,8 @@ class SoundGenerator {
     return _onIsPlayingChanged;
   }
 
-  /// One cycle data changed event
-  static bool _onGetOneCycleDataHandlerInitialized = false;
-  static late Stream<List<int>> _onGetOneCycleDataHandler;
-  static Stream<List<int>> get onOneCycleDataHandler {
-    if (!_onGetOneCycleDataHandlerInitialized) {
-      _onGetOneCycleDataHandler = _onOneCycleDataHandler.receiveBroadcastStream().map<List<int>>((value) => new List<int>.from(value));
-      _onGetOneCycleDataHandlerInitialized = true;
-    }
-
-    return _onGetOneCycleDataHandler;
-  }
+  /// Release all data
+  static void release() => _channel.invokeMethod('release');
 
   /// Play sound
   static Future<void> start(String uid, double frequency, {WaveForm waveForm = WaveForm.sine}) => _channel.invokeMethod(
@@ -47,26 +37,26 @@ class SoundGenerator {
   /// Change frequency of given sound
   static void setFrequency(String uid, double frequency) => _channel.invokeMethod('set_frequency', {'uid': uid, 'frequency': frequency});
 
-  /// Release all data
-  static void release() => _channel.invokeMethod('release');
+  /// Get frequency of given sound
+  static Future<double> getFrequency(String uid) async {
+    final double frequency = await _channel.invokeMethod('get_frequency', {'uid': uid});
+    return frequency;
+  }
 
-  /// Refresh One Cycle Data
-  static void refreshOneCycleData() async => _channel.invokeMethod('refresh_one_cycle_data');
+  /// Change sample rate of all sounds
+  static void setSampleRate(double sampleRate) => _channel.invokeMethod('set_sample_rate', {'sample_rate': sampleRate});
+
+  /// Get sample rate
+  static Future<int> getSampleRate() async {
+    final int sampleRate = await _channel.invokeMethod('set_sample_rate');
+    return sampleRate;
+  }
 
   /// Get is Playing data
   static Future<bool> get isPlaying async {
     final bool playing = await _channel.invokeMethod('is_playing');
     return playing;
   }
-
-  /// Set AutoUpdateOneCycleSample
-  static Future<void> setAutoUpdateOneCycleSample(bool autoUpdateOneCycleSample) => _channel.invokeMethod(
-        "set_auto_update_one_cycle_sample",
-        {"auto_update_one_cycle_sample": autoUpdateOneCycleSample},
-      );
-
-  /// Set Balance Range from -1 to 1
-  static Future<void> setBalance(double balance) => _channel.invokeMethod("set_balance", {"balance": balance});
 
   /// Set Volume Range from 0 to 1
   static Future<void> setVolume(double volume) => _channel.invokeMethod("set_volume", {"volume": volume});
