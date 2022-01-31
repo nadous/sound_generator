@@ -52,6 +52,10 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     public init(registrar: FlutterPluginRegistrar) {
         super.init()
         
+        let methodChannel = FlutterMethodChannel(name: "sound_generator", binaryMessenger: registrar.messenger())
+        self.onChangeIsPlaying = BetterEventChannel(name: "io.github.mertguner.sound_generator/onChangeIsPlaying", messenger: registrar.messenger())
+        registrar.addMethodCallDelegate(self, channel: methodChannel)
+        
         AKSettings.disableAVAudioSessionCategoryManagement = true
         AKSettings.disableAudioSessionDeactivationOnStop = true
         AKSettings.sampleRate = self.sampleRate
@@ -60,9 +64,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         self.mixer!.volume = self.volume
         AKManager.output = self.mixer!
         
-        let methodChannel = FlutterMethodChannel(name: "sound_generator", binaryMessenger: registrar.messenger())
-        self.onChangeIsPlaying = BetterEventChannel(name: "io.github.mertguner.sound_generator/onChangeIsPlaying", messenger: registrar.messenger())
-        registrar.addMethodCallDelegate(self, channel: methodChannel)
+        _ = _startEngine()
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -127,6 +129,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             let uid = args["uid"] as! String
             let frequency = args["frequency"] as! Double
             
+            self.oscillators[uid]?.frequency = frequency
             result(nil);
             break;
         case "set_sample_rate":
