@@ -8,8 +8,11 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     var sampleRate = 44100.0
     var volume = 1.0
     
+    var envelopes:[String:AKAmplitudeEnvelope] = [:]
     var oscillators:[String:AKOscillator] = [:]
-    var mixer: AKMixer?;
+    
+    weak var timer: Timer?;
+     var mixer: AKMixer?;
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         _ = SwiftSoundGeneratorPlugin(registrar: registrar)
@@ -32,8 +35,13 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     }
     
     private func _stop() {
-        _ = self.oscillators.map{$1.stop()}
-        AKManager.disconnectAllInputs()
+        _ = self.envelopes.map{$1.stop()}
+        timer?.invalidate()
+        timer = .scheduledTimer(withTimeInterval: 1.0, repeats: false) {
+            [weak self] timer in
+            _ = self?.oscillators.map{$1.stop()}
+            AKManager.disconnectAllInputs()
+        }
     }
     
     private func _startEngine() -> Bool {
@@ -52,10 +60,6 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     public init(registrar: FlutterPluginRegistrar) {
         super.init()
         
-        let methodChannel = FlutterMethodChannel(name: "sound_generator", binaryMessenger: registrar.messenger())
-        self.onChangeIsPlaying = BetterEventChannel(name: "io.github.mertguner.sound_generator/onChangeIsPlaying", messenger: registrar.messenger())
-        registrar.addMethodCallDelegate(self, channel: methodChannel)
-        
         AKSettings.disableAVAudioSessionCategoryManagement = true
         AKSettings.disableAudioSessionDeactivationOnStop = true
         AKSettings.sampleRate = self.sampleRate
@@ -64,7 +68,9 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
         self.mixer!.volume = self.volume
         AKManager.output = self.mixer!
         
-        _ = _startEngine()
+        let methodChannel = FlutterMethodChannel(name: "sound_generator", binaryMessenger: registrar.messenger())
+        self.onChangeIsPlaying = BetterEventChannel(name: "io.github.mertguner.sound_generator/onChangeIsPlaying", messenger: registrar.messenger())
+        registrar.addMethodCallDelegate(self, channel: methodChannel)
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -82,14 +88,22 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             
             let oscillator = AKOscillator(waveform: waveForm)
             oscillator.frequency = frequency
-            
-            self.mixer?.connect(input: oscillator)
+            oscillator.rampDuration = 0
             self.oscillators[uid] = oscillator
             
+            let envelope = AKAmplitudeEnvelope(oscillator)
+            envelope.attackDuration = 0.01
+            envelope.decayDuration = 0.01
+            envelope.sustainLevel = 1
+            envelope.releaseDuration = 0.01
+            self.envelopes[uid] = envelope
+            
+            self.mixer?.connect(input: envelope)
             let started = _startEngine()
             
             if started {
                 oscillator.start()
+                envelope.start()
                 result(uid);
             } else {
                 result(FlutterError(
@@ -105,8 +119,15 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             let args = call.arguments as! [String: Any]
             let uid = args["uid"] as! String
             
-            self.oscillators[uid]?.stop()
-            self.oscillators.removeValue(forKey: uid)
+            self.envelopes[uid]?.stop()
+            self.envelopes.removeValue(forKey: uid)
+            
+            timer?.invalidate()
+            timer = .scheduledTimer(withTimeInterval: 1.0, repeats: false) {
+                [weak self] timer in
+                self?.oscillators[uid]?.stop()
+                self?.oscillators.removeValue(forKey: uid)
+            }
             
             onChangeIsPlaying!.sendEvent(event: ["uid": uid, "is_playing": false])
             result(nil)
@@ -129,7 +150,9 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             let uid = args["uid"] as! String
             let frequency = args["frequency"] as! Double
             
-            self.oscillators[uid]?.frequency = frequency
+            let oscillator = self.oscillators[uid] as AKOscillator?
+            oscillator?.frequency = frequency
+            
             result(nil);
             break;
         case "set_sample_rate":
