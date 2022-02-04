@@ -32,7 +32,7 @@ class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), priva
 
     private val volumeShaperConf: VolumeShaper.Configuration? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
         VolumeShaper.Configuration.Builder()
-                .setDuration(100)
+                .setDuration(50)
                 .setCurve(floatArrayOf(0f, 1f), floatArrayOf(0f, 1f))
                 .setInterpolatorType(VolumeShaper.Configuration.INTERPOLATOR_TYPE_LINEAR)
                 .build()
