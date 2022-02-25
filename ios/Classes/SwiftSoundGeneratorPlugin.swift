@@ -11,8 +11,7 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     var envelopes:[String:AKAmplitudeEnvelope] = [:]
     var oscillators:[String:AKOscillator] = [:]
     
-    weak var timer: Timer?;
-     var mixer: AKMixer?;
+    var mixer: AKMixer?;
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         _ = SwiftSoundGeneratorPlugin(registrar: registrar)
@@ -36,12 +35,6 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
     
     private func _stop() {
         _ = self.envelopes.map{$1.stop()}
-        timer?.invalidate()
-        timer = .scheduledTimer(withTimeInterval: 1.0, repeats: false) {
-            [weak self] timer in
-            _ = self?.oscillators.map{$1.stop()}
-            AKManager.disconnectAllInputs()
-        }
     }
     
     private func _startEngine() -> Bool {
@@ -102,14 +95,23 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             let started = _startEngine()
             
             if started {
+                for(uid, _) in self.envelopes {
+                    if (!(self.envelopes[uid]?.isPlaying ?? false))
+                    {
+                        self.envelopes.removeValue(forKey: uid)
+                        self.oscillators[uid]?.stop()
+                        self.oscillators.removeValue(forKey: uid)
+                    }
+                }
+                
                 oscillator.start()
                 envelope.start()
                 result(uid);
             } else {
                 result(FlutterError(
-                        code: "init_error",
-                        message: "Unable to start AKManager",
-                        details: ""))
+                    code: "init_error",
+                    message: "Unable to start AKManager",
+                    details: ""))
             }
             
             onChangeIsPlaying!.sendEvent(event: ["uid": uid, "is_playing": true])
@@ -120,14 +122,6 @@ public class SwiftSoundGeneratorPlugin: NSObject, FlutterPlugin {
             let uid = args["uid"] as! String
             
             self.envelopes[uid]?.stop()
-            self.envelopes.removeValue(forKey: uid)
-            
-            timer?.invalidate()
-            timer = .scheduledTimer(withTimeInterval: 1.0, repeats: false) {
-                [weak self] timer in
-                self?.oscillators[uid]?.stop()
-                self?.oscillators.removeValue(forKey: uid)
-            }
             
             onChangeIsPlaying!.sendEvent(event: ["uid": uid, "is_playing": false])
             result(nil)
