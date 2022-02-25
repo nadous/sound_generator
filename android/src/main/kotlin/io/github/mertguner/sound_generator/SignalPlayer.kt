@@ -11,14 +11,10 @@ import java.util.concurrent.TimeUnit
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), private var sampleSize: Int, sampleRate: Int, var frequency: Float) {
-    private val _2Pi = 2f * Math.PI.toFloat()
-    private var phCoefficient = _2Pi / sampleRate.toFloat()
-    private var smoothStep = 1f / sampleRate.toFloat() * 20f
+    private val twoPi = 2f * Math.PI.toFloat()
     private val backgroundBuffer: ShortArray = ShortArray(sampleSize)
     private val buffer: ShortArray = ShortArray(sampleSize)
 
-    private var ph = 0f
-    private var oldFrequency = 50f
     private var creatingNewData = false
 
     private var audioTrack: AudioTrack = AudioTrack(
@@ -36,7 +32,7 @@ class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), priva
 
     private val volumeShaperConf: VolumeShaper.Configuration? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
         VolumeShaper.Configuration.Builder()
-                .setDuration(300)
+                .setDuration(50)
                 .setCurve(floatArrayOf(0f, 1f), floatArrayOf(0f, 1f))
                 .setInterpolatorType(VolumeShaper.Configuration.INTERPOLATOR_TYPE_LINEAR)
                 .build()
@@ -47,8 +43,6 @@ class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), priva
     var sampleRate = sampleRate
         set(value) {
             field = value
-            phCoefficient = _2Pi / sampleRate.toFloat()
-            smoothStep = 1f / sampleRate.toFloat() * 20f
         }
 
     var playing = false
@@ -110,11 +104,7 @@ class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), priva
         creatingNewData = true
 
         for (i in 0 until sampleSize) {
-            oldFrequency += (frequency - oldFrequency) * smoothStep
-            backgroundBuffer[i] = generator.getValue(ph.toDouble(), _2Pi.toDouble())
-            ph += oldFrequency * phCoefficient
-
-            if (ph > _2Pi) ph -= _2Pi
+            backgroundBuffer[i] = generator.getValue(frequency.toDouble(), twoPi.toDouble())
         }
 
         creatingNewData = false
