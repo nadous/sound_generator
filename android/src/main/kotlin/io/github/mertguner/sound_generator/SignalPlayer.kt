@@ -7,13 +7,13 @@ import io.github.mertguner.sound_generator.generators.BaseGenerator
 import io.github.mertguner.sound_generator.generators.SineGenerator
 import kotlinx.coroutines.*
 import java.util.*
-import java.util.concurrent.TimeUnit
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), private var sampleSize: Int, sampleRate: Int, var frequency: Float) {
     private val twoPi = 2f * Math.PI.toFloat()
     private val backgroundBuffer: ShortArray = ShortArray(sampleSize)
     private val buffer: ShortArray = ShortArray(sampleSize)
+    private val phCoefficient: Float = twoPi / sampleRate.toFloat()
 
     private var creatingNewData = false
 
@@ -104,7 +104,7 @@ class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), priva
         creatingNewData = true
 
         for (i in 0 until sampleSize) {
-            backgroundBuffer[i] = generator.getValue(frequency.toDouble(), twoPi.toDouble())
+            backgroundBuffer[i] = generator.getValue(frequency.toDouble() * phCoefficient, twoPi.toDouble())
         }
 
         creatingNewData = false
