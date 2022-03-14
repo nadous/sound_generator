@@ -6,15 +6,15 @@ import androidx.annotation.RequiresApi
 import io.github.mertguner.sound_generator.generators.BaseGenerator
 import io.github.mertguner.sound_generator.generators.SineGenerator
 import kotlinx.coroutines.*
-import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
 class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), private var sampleSize: Int, sampleRate: Int, var frequency: Float) {
     private val twoPi = 2f * Math.PI.toFloat()
     private val backgroundBuffer: ShortArray = ShortArray(sampleSize)
     private val buffer: ShortArray = ShortArray(sampleSize)
-    private val phCoefficient: Float = twoPi / sampleRate.toFloat()
 
+    private var phCoefficient: Float = twoPi / sampleRate.toFloat()
+    private var ph:Float = .0F
     private var creatingNewData = false
 
     private var audioTrack: AudioTrack = AudioTrack(
@@ -30,7 +30,7 @@ class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), priva
             sampleSize, AudioTrack.MODE_STREAM, AudioManager.AUDIO_SESSION_ID_GENERATE)
     private var bufferThread: Thread? = null
 
-    private val volumeShaperConf: VolumeShaper.Configuration? = if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+    private val volumeShaperConf: VolumeShaper.Configuration? = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         VolumeShaper.Configuration.Builder()
                 .setDuration(50)
                 .setCurve(floatArrayOf(0f, 1f), floatArrayOf(0f, 1f))
@@ -43,6 +43,7 @@ class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), priva
     var sampleRate = sampleRate
         set(value) {
             field = value
+            phCoefficient = twoPi / value.toFloat()
         }
 
     var playing = false
@@ -54,7 +55,7 @@ class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), priva
                     audioTrack.flush()
                     audioTrack.playbackHeadPosition = 0
                     audioTrack.play()
-                    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                         val volumeShaper = audioTrack.createVolumeShaper(volumeShaperConf!!)
                         volumeShaper.apply(VolumeShaper.Operation.PLAY)
                     }
@@ -66,7 +67,7 @@ class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), priva
 
                 bufferThread!!.start()
             } else {
-                if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                     val volumeShaper = audioTrack.createVolumeShaper(volumeShaperConf!!)
                     volumeShaper.apply(VolumeShaper.Operation.REVERSE)
                 }
@@ -104,7 +105,12 @@ class SignalPlayer(private val generator: BaseGenerator = SineGenerator(), priva
         creatingNewData = true
 
         for (i in 0 until sampleSize) {
-            backgroundBuffer[i] = generator.getValue(frequency.toDouble() * phCoefficient, twoPi.toDouble())
+            backgroundBuffer[i] = generator.getValue(ph.toDouble(), twoPi.toDouble())
+            ph += frequency * phCoefficient
+
+            if (ph > twoPi) {
+                ph -= twoPi
+            }
         }
 
         creatingNewData = false
